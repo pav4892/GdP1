@@ -177,7 +177,7 @@ int doLevel() {
 
         // Process userworm
         // Now move the worm for one step
-        moveWorm(WORM_GAME_ONGOING);
+        moveWorm(&game_state);
         // Bail out of the loop if something bad happened
         if ( game_state != WORM_GAME_ONGOING ) {
             end_level_loop = 1;
