@@ -148,8 +148,6 @@ void cleanWormTail() {
     if(theworm_headindex >= WORM_LENGTH) {
         tailindex += 1;
     }
-
-    FILE *fp = fopen("exampleCM.txt", "a");fprintf(fp, "hey:%d\n", tailindex); fclose(fp);
     // Check the array of worm elements.
     // Is the array element at tailindex already in use?
     // Checking either array theworm_wormpos_y
