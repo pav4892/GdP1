@@ -32,7 +32,7 @@ void placeItem(int y, int x, chtype symbol, Color_Pairs color_pair) {
 
 // Get the last usable row on the display
 int getLastRow() {
-    return LINES - 1;
+    return LINES - 1 - ROWS_RESERVED;
 }
 
 // Get the last usable column on the display

@@ -47,6 +47,7 @@ extern void cleanWormTail(struct worm* aworm);
 extern void moveWorm(struct worm* aworm, Game_States* agame_state);
 extern bool isInUseByWorm(struct worm* aworm, struct pos new_headpos);
 extern void setWormHeading(struct worm* aworm, Worm_Heading dir);
+extern struct pos getWormHeadPos(struct worm* aworm);
 
 
 #endif  // #define _WORM_MODEL_H

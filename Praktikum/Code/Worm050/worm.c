@@ -37,6 +37,7 @@ void initializeColors() {
     start_color();
     init_pair(COLP_USER_WORM, COLOR_GREEN, COLOR_BLACK);
     init_pair(COLP_FREE_CELL, COLOR_BLACK, COLOR_BLACK);
+    init_pair(COLP_BARRIER, COLOR_RED, COLOR_BLACK);
 }
 
 void readUserInput(struct worm* aworm, Game_States* agame_state ) {
@@ -97,6 +98,8 @@ Res_Codes doLevel() {
     if ( res_code != RES_OK) {
     //    return res_code;
     }
+    // Show border line in order to separate the message area
+    showBorderLine();
     // Show worm at its initial position
     showWorm(&userworm);
 
@@ -124,6 +127,10 @@ Res_Codes doLevel() {
         }
         // Show the worm at its new position
         showWorm(&userworm);
+
+        // Inform user about position and length of userworm in status window
+        showStatus(&userworm);
+
         userworm.maxindex += 1;
         // END process userworm
 
@@ -137,6 +144,29 @@ Res_Codes doLevel() {
     // Preset res_code for rest of the function
     res_code = RES_OK;
 
+    // For some reason we left the control loop of the current level
+    // Check why according to game_state
+    switch (game_state) {
+        case WORM_GAME_QUIT:
+            // User must have typed 'q' for quit
+            showDialog("Sie haben die aktuelle Runde abgebrochen!",
+            "Bitte Taste druecken");
+            break;
+        case WORM_OUT_OF_BOUNDS:
+            showDialog("Sie haben das Spiel verloren,"
+            " weil Sie das Spielfeld verlassen haben",
+            "Bitte Taste druecken");
+            break;
+        case WORM_CROSSING:
+            showDialog("Sie haben das Spiel verloren,"
+            " weil Sie einen Wurm gekreuzt haben",
+            "Bitte Taste druecken");
+            break;
+        default:
+        showDialog("Interner Fehler!","Bitte Taste druecken");
+        // Set error result code. This should never happen.
+        res_code = RES_INTERNAL_ERROR;
+    }
     // For some reason we left the control loop of the current level.
     // However, in this version we do not yet check for the reason.
     // There is no user feedback at the moment!
@@ -162,13 +192,13 @@ int main(void) {
 
     // Check if the window is large enough to display messages in the message area
     // a has space for at least one line for the worm
-    if ( LINES < MIN_NUMBER_OF_ROWS || COLS < MIN_NUMBER_OF_COLS ) {
+    if ( LINES < MIN_NUMBER_OF_ROWS + ROWS_RESERVED || COLS < MIN_NUMBER_OF_COLS ) {
         // Since we not even have the space for displaying messages
         // we print a conventional error message via printf after
         // the call of cleanupCursesApp()
         cleanupCursesApp();
         printf("Das Fenster ist zu klein: wir brauchen mindestens %dx%d\n",
-                MIN_NUMBER_OF_COLS, MIN_NUMBER_OF_ROWS );
+                MIN_NUMBER_OF_COLS, MIN_NUMBER_OF_ROWS + ROWS_RESERVED);
         res_code = RES_FAILED;
     } else {
         res_code = doLevel();

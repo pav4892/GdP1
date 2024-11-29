@@ -29,6 +29,12 @@ int tailindex = 0;
 // Functions concerning the management of the worm data
 // *****************************************************
 
+// Getters
+struct pos getWormHeadPos(struct worm* aworm) {
+// Structures are passed by value!
+// -> we return a copy here
+return aworm->wormpos[aworm->headindex];
+}
 
 // Initialize the worm
 Res_Codes initializeWorm(struct worm* aworm, int len_max, struct pos headpos, Worm_Heading dir, Color_Pairs color) {
