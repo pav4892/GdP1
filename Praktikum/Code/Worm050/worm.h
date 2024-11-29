@@ -26,7 +26,7 @@ typedef enum {
 #define NAP_TIME    100   // Time in milliseconds to sleep between updates of display
 #define MIN_NUMBER_OF_ROWS  3   // The guaranteed number of rows available for the board
 #define MIN_NUMBER_OF_COLS 10   // The guaranteed number of columns available for the board
-#define WORM_LENGTH 20+1 // Maximal length of the worm. Length here is 20: the + 1 is needed because I'm lazy
+#define WORM_LENGTH 20 // Maximal length of the worm. Length here is 20: the + 1 is needed because I'm lazy
 
 // ### Codes for the array of positions ###
 // Unused element in the worm arrays of positions

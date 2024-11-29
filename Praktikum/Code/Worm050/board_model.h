@@ -14,6 +14,11 @@
 #ifndef _BOARD_MODEL_H
 #define _BOARD_MODEL_H
 
+// Positions on the board
+struct pos {
+  int y; // y-coordinate (row)
+  int x; // x-coordinate (column)
+};
 // Placing and removing items from the game board
 // Check boundaries of game board
 extern void placeItem(int y, int x, chtype symbol, Color_Pairs);
