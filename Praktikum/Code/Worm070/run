@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rm -rf bin
+make
+printf "\n\n"
+./bin/worm
