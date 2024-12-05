@@ -24,8 +24,8 @@
 
 // Management of the game
 void initializeColors();
-void readUserInput(struct worm* aworm, Game_States* agame_state );
-Res_Codes doLevel();
+void readUserInput(struct worm* aworm, enum GameStates* agame_state );
+enum ResCodes doLevel();
 
 // ************************************
 // Management of the game
@@ -38,10 +38,13 @@ void initializeColors() {
     start_color();
     init_pair(COLP_USER_WORM, COLOR_GREEN, COLOR_BLACK);
     init_pair(COLP_FREE_CELL, COLOR_BLACK, COLOR_BLACK);
+    init_pair(COLP_FOOD_1, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(COLP_FOOD_2, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COLP_FOOD_3, COLOR_CYAN, COLOR_BLACK);
     init_pair(COLP_BARRIER, COLOR_RED, COLOR_BLACK);
 }
 
-void readUserInput(struct worm* aworm, Game_States* agame_state ) {
+void readUserInput(struct worm* aworm, enum GameStates* agame_state ) {
 
     //Capture the Arrow Keys and act accordingly
 
@@ -72,43 +75,54 @@ void readUserInput(struct worm* aworm, Game_States* agame_state ) {
             case ' ' : // Terminate single step; make getch non-blocking again
                 nodelay(stdscr, TRUE);  // make getch to be a non-blocking call
                 break;
+            case 'g' : // For development: let the worm grow by BONUS_3 elements
+                growWorm(aworm, BONUS_3);
+                break;
         }
     }
     return;
 }
 
-Res_Codes doLevel() {
+int loop_counter = 0;
+
+enum ResCodes doLevel() {
 
     // Das ist die Hauptfunktion und hier wird auch die main-loop gehandelt und viele andere Funktionen aufgerufen
-    struct worm userworm; // Local variable for storing the user’s worm
+    struct worm userworm; // Currently we just use one user worm in the game
     struct pos bottomLeft;
-    Game_States game_state; // The current game_state
-
-    Res_Codes res_code; // Result code from functions
+    struct board theboard; // Our game board
+    enum GameStates game_state; // The current game_state
+    enum ResCodes res_code;
     bool end_level_loop;    // Indicates whether we should leave the main loop
-
-    // At the beginnung of the level, we still have a chance to win
     game_state = WORM_GAME_ONGOING;
 
-    // There is always an initialized user worm.
-    // Initialize the userworm with its size, position, heading.
-    bottomLeft.y =  getLastRow();
-    bottomLeft.x =  0;
+    // Setup the board
+    res_code = initializeBoard(&theboard);
 
-    res_code = initializeWorm(&userworm, WORM_LENGTH, bottomLeft, WORM_RIGHT, COLP_USER_WORM);
     if ( res_code != RES_OK) {
-    //    return res_code;
+        return res_code;
     }
-    // Show border line in order to separate the message area
-    showBorderLine();
-    // Show worm at its initial position
-    showWorm(&userworm);
+    
+    // Initialize the current level
+    res_code = initializeLevel(&theboard);
+    if ( res_code != RES_OK) {
+        return res_code;
+    }
 
+    bottomLeft.y = getLastRowOnBoard(&theboard);
+    bottomLeft.x = 0;
+    res_code = initializeWorm(&userworm, WORM_LENGTH, WORM_INITIAL_LENGTH,
+    bottomLeft , WORM_RIGHT, COLP_USER_WORM);
+
+    if ( res_code != RES_OK) {
+        return res_code;
+    }
     // Display all what we have set up until now
     refresh();
     // Start the loop for this level
     end_level_loop = false; // Flag for controlling the main loop
     while(!end_level_loop) {
+        loop_counter += 1;
         // Process optional user input
         readUserInput(&userworm, &game_state); 
         if ( game_state == WORM_GAME_QUIT ) {
@@ -116,31 +130,34 @@ Res_Codes doLevel() {
             continue; // Go to beginning of the loop's block and check loop condition
         }
         // Process userworm
-        if(userworm.headindex >= WORM_LENGTH-1) {
-            cleanWormTail(&userworm);
+        if(loop_counter >= 4) {
+            cleanWormTail(&theboard, &userworm);
         }
         // Now move the worm for one step
-        moveWorm(&userworm, &game_state);
+        moveWorm(&theboard, &userworm, &game_state);
         // Bail out of the loop if something bad happened
         if ( game_state != WORM_GAME_ONGOING ) {
             end_level_loop = 1;
             continue; // Go to beginning of the loop's block and check loop condition
         }
         // Show the worm at its new position
-        showWorm(&userworm);
+        showWorm(&theboard, &userworm);
 
         // Inform user about position and length of userworm in status window
-        showStatus(&userworm);
+        showStatus(&theboard, &userworm);
 
         userworm.maxindex += 1;
         // END process userworm
-
         // Sleep a bit before we show the updated window
         napms(NAP_TIME);
 
         // Display all the updates
         refresh();
-
+    
+        // Are we done with that level?
+        if (getNumberOfFoodItems(&theboard) == 0) {
+            end_level_loop = true;
+        }
     }
     // Preset res_code for rest of the function
     res_code = RES_OK;
@@ -148,9 +165,23 @@ Res_Codes doLevel() {
     // For some reason we left the control loop of the current level
     // Check why according to game_state
     switch (game_state) {
+        case WORM_GAME_ONGOING:
+            if (getNumberOfFoodItems(&theboard) == 0) {
+                showDialog("Sie habe diese Runde erfolgreich beendet !!!", "Bitte Taste druecken");
+            } else {
+                showDialog("Interner Fehler!","Bitte Taste druecken");
+                // Correct result code
+                res_code = RES_INTERNAL_ERROR;
+            }
+            break;
         case WORM_GAME_QUIT:
             // User must have typed 'q' for quit
             showDialog("Sie haben die aktuelle Runde abgebrochen!",
+            "Bitte Taste druecken");
+            break;
+        case WORM_CRASH:
+            showDialog("Sie haben das Spiel verloren,"
+            " weil Sie in die Barriere gefahren sind",
             "Bitte Taste druecken");
             break;
         case WORM_OUT_OF_BOUNDS:
@@ -164,9 +195,9 @@ Res_Codes doLevel() {
             "Bitte Taste druecken");
             break;
         default:
-        showDialog("Interner Fehler!","Bitte Taste druecken");
-        // Set error result code. This should never happen.
-        res_code = RES_INTERNAL_ERROR;
+            showDialog("Interner Fehler!","Bitte Taste druecken");
+            // Set error result code. This should never happen.
+            res_code = RES_INTERNAL_ERROR;
     }
     // For some reason we left the control loop of the current level.
     // However, in this version we do not yet check for the reason.
@@ -182,7 +213,8 @@ Res_Codes doLevel() {
 // ********************************************************************************************
 
 int main(void) {
-    Res_Codes res_code;         // Result code from functions
+    
+    enum ResCodes res_code;         // Result code from functions
 
     // Here we start
     initializeCursesApplication();  // Init various settings of our application

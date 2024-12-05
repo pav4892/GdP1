@@ -57,8 +57,7 @@ enum WormHeading {
     WORM_RIGHT
 };
 
-extern enum ResCodes initializeWorm(struct worm* aworm, int len_max, int len_cur,
-                                    struct pos headpos, enum WormHeading dir, enum ColorPairs color);
+extern enum ResCodes initializeWorm(struct worm* aworm, int len_max, int len_cur, struct pos headpos, enum WormHeading dir, enum ColorPairs color);
 
 extern void growWorm(struct worm* aworm, enum Boni growth);
 extern void showWorm(struct board* aboard, struct worm* aworm);

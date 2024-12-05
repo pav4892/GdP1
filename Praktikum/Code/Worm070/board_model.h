@@ -64,4 +64,6 @@ extern int getLastColOnBoard(struct board* aboard);
 extern void decrementNumberOfFoodItems(struct board* aboard);
 extern void setNumberOfFoodItems(struct board* aboard, int n);
 
+
+
 #endif  // #define _BOARD_MODEL_H
