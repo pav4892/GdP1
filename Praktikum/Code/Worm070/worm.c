@@ -149,7 +149,7 @@ enum ResCodes doLevel() {
         userworm.maxindex += 1;
         // END process userworm
         // Sleep a bit before we show the updated window
-        napms(NAP_TIME);
+        //napms(NAP_TIME);
 
         // Display all the updates
         refresh();

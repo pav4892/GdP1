@@ -65,7 +65,10 @@ enum ResCodes initializeWorm(struct worm* aworm, int len_max, int len_cur, struc
     return RES_OK;
 }
 
+int globalGrowth;
+
 void growWorm(struct worm* aworm, enum Boni growth) {
+    globalGrowth = growth;
     // Play it safe and inhibit surpassing the bound
     if (aworm->cur_lastindex + growth <= aworm->maxindex) {
         aworm->cur_lastindex += growth;
@@ -83,18 +86,39 @@ void growWorm(struct worm* aworm, enum Boni growth) {
 
 void showWorm(struct board* aboard, struct worm* aworm) {
         initializeLevel(aboard);
-        for(int i = 0; i <= getWormLength(aworm) - 1; i++) {
-            placeItem(aboard, aworm->wormpos[i].y, aworm->wormpos[i].x, BC_USED_BY_WORM,SYMBOL_WORM_INNER_ELEMENT, aworm->wcolor);
+        int thingy = 0; 
+
+        if(COLS >= 80) {
+            thingy = 15; 
+        } else {
+            thingy = 1;
+        }
+        
+        for(int y = 0; y <= aboard->last_row+5; y++) {
+            for(int i = 1; i <= thingy; i++) {
+                move(y, aboard->last_col+i);
+                attron(COLOR_PAIR(COLP_FREE_CELL));
+                addch(SYMBOL_FREE_CELL);
+                attroff(COLOR_PAIR(COLP_FREE_CELL));
+            }
         }
 
-        placeItem(aboard, aworm->wormpos[aworm->headindex].y, aworm->wormpos[aworm->headindex].x, BC_USED_BY_WORM,SYMBOL_WORM_HEAD_ELEMENT,aworm->wcolor);
 
-        if(aworm->headindex+1 == aworm->cur_lastindex) {
+    for(int i = 0; i <= getWormLength(aworm) - 1; i++) {
+        placeItem(aboard, aworm->wormpos[i].y, aworm->wormpos[i].x, BC_USED_BY_WORM,SYMBOL_WORM_INNER_ELEMENT, aworm->wcolor);
+    }
+
+    placeItem(aboard, aworm->wormpos[aworm->headindex].y, aworm->wormpos[aworm->headindex].x, BC_USED_BY_WORM,SYMBOL_WORM_HEAD_ELEMENT, aworm->wcolor);
+
+    if(!sizeChanged) {
+        if(aworm->headindex + 1 == aworm->cur_lastindex) {
             placeItem(aboard, aworm->wormpos[0].y, aworm->wormpos[0].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT,aworm->wcolor);
         } else {
-            placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT,aworm->wcolor);
+            placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT, aworm->wcolor);
         }
+    } 
 
+    if(sizeChanged) {
         for (int y = 0; y <= aboard->last_row; y++) {
             for (int x = 0; x <= aboard->last_col ; x++) {
                 if(aboard->cells[y][x] == 0) {
@@ -102,7 +126,7 @@ void showWorm(struct board* aboard, struct worm* aworm) {
                 }
             }
         }
-
+    }
 }
 
 void moveWorm(struct board* aboard, struct worm* aworm,
@@ -181,6 +205,7 @@ void moveWorm(struct board* aboard, struct worm* aworm,
 
             // Store new coordinates of head element in worm structure
             aworm->wormpos[aworm->headindex] = headpos;
+            napms(NAP_TIME);
         }
     
 }
