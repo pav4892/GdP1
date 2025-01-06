@@ -1,0 +1,51 @@
+==10607== Memcheck, a memory error detector
+==10607== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==10607== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==10607== Command: ./bin/worm
+==10607== Parent PID: 10048
+==10607== 
+==10607== Invalid read of size 4
+==10607==    at 0x10A1E8: placeItem (board_model.c:28)
+==10607==    by 0x109DF9: showWorm (worm_model.c:109)
+==10607==    by 0x109732: doLevel (worm.c:144)
+==10607==    by 0x109915: main (worm.c:237)
+==10607==  Address 0x4b1fe44 is 4 bytes before a block of size 220 alloc'd
+==10607==    at 0x4845314: calloc (vg_replace_malloc.c:1328)
+==10607==    by 0x10A40F: initializeBoard (board_model.c:91)
+==10607==    by 0x1095DC: doLevel (worm.c:100)
+==10607==    by 0x109915: main (worm.c:237)
+==10607== 
+==10607== Invalid write of size 4
+==10607==    at 0x10A1F5: placeItem (board_model.c:28)
+==10607==    by 0x109DF9: showWorm (worm_model.c:109)
+==10607==    by 0x109732: doLevel (worm.c:144)
+==10607==    by 0x109915: main (worm.c:237)
+==10607==  Address 0xfffffffc is not stack'd, malloc'd or (recently) free'd
+==10607== 
+==10607== 
+==10607== Process terminating with default action of signal 11 (SIGSEGV)
+==10607==  Access not within mapped region at address 0xFFFFFFFC
+==10607==    at 0x10A1F5: placeItem (board_model.c:28)
+==10607==    by 0x109DF9: showWorm (worm_model.c:109)
+==10607==    by 0x109732: doLevel (worm.c:144)
+==10607==    by 0x109915: main (worm.c:237)
+==10607==  If you believe this happened as a result of a stack
+==10607==  overflow in your program's main thread (unlikely but
+==10607==  possible), you can try to increase the size of the
+==10607==  main thread stack using the --main-stacksize= flag.
+==10607==  The main thread stack size used in this run was 8388608.
+==10607== 
+==10607== HEAP SUMMARY:
+==10607==     in use at exit: 216,840 bytes in 541 blocks
+==10607==   total heap usage: 553 allocs, 12 frees, 223,772 bytes allocated
+==10607== 
+==10607== LEAK SUMMARY:
+==10607==    definitely lost: 0 bytes in 0 blocks
+==10607==    indirectly lost: 0 bytes in 0 blocks
+==10607==      possibly lost: 448 bytes in 9 blocks
+==10607==    still reachable: 216,392 bytes in 532 blocks
+==10607==         suppressed: 0 bytes in 0 blocks
+==10607== Rerun with --leak-check=full to see details of leaked memory
+==10607== 
+==10607== For lists of detected and suppressed errors, rerun with: -s
+==10607== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)

@@ -69,13 +69,15 @@ int globalGrowth;
 
 void growWorm(struct worm* aworm, enum Boni growth) {
     globalGrowth = growth;
-    // Play it safe and inhibit surpassing the bound
+    aworm->cur_lastindex += growth;
+    /* Play it safe and inhibit surpassing the bound
     if (aworm->cur_lastindex + growth <= aworm->maxindex) {
         aworm->cur_lastindex += growth;
     } else {
         aworm->cur_lastindex = aworm->maxindex;
     }
     sizeChanged = 1;
+    */
 }
 
 // Show the worms's elements on the display
@@ -105,16 +107,22 @@ void showWorm(struct board* aboard, struct worm* aworm) {
 
 
     for(int i = 0; i <= getWormLength(aworm) - 1; i++) {
-        placeItem(aboard, aworm->wormpos[i].y, aworm->wormpos[i].x, BC_USED_BY_WORM,SYMBOL_WORM_INNER_ELEMENT, aworm->wcolor);
+        if(aworm->wormpos[i].y != UNUSED_POS_ELEM) {
+            placeItem(aboard, aworm->wormpos[i].y, aworm->wormpos[i].x, BC_USED_BY_WORM,SYMBOL_WORM_INNER_ELEMENT, aworm->wcolor);
+        }
     }
 
-    placeItem(aboard, aworm->wormpos[aworm->headindex].y, aworm->wormpos[aworm->headindex].x, BC_USED_BY_WORM,SYMBOL_WORM_HEAD_ELEMENT, aworm->wcolor);
+    if(aworm->wormpos[aworm->headindex].y != UNUSED_POS_ELEM) {
+        placeItem(aboard, aworm->wormpos[aworm->headindex].y, aworm->wormpos[aworm->headindex].x, BC_USED_BY_WORM,SYMBOL_WORM_HEAD_ELEMENT, aworm->wcolor);
+    }
 
     if(!sizeChanged) {
         if(aworm->headindex + 1 == aworm->cur_lastindex) {
             placeItem(aboard, aworm->wormpos[0].y, aworm->wormpos[0].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT,aworm->wcolor);
         } else {
-            placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT, aworm->wcolor);
+            if(aworm->wormpos[aworm->headindex+1].y != UNUSED_POS_ELEM) {
+                placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_USED_BY_WORM,SYMBOL_WORM_TAIL_ELEMENT, aworm->wcolor);
+            }
         }
     } 
 
@@ -127,6 +135,7 @@ void showWorm(struct board* aboard, struct worm* aworm) {
             }
         }
     }
+    
 }
 
 void moveWorm(struct board* aboard, struct worm* aworm,
@@ -229,9 +238,13 @@ bool isInUseByWorm(struct worm* aworm, struct pos new_headpos) {
 
 void cleanWormTail(struct board* aboard, struct worm* aworm) { 
     if(aworm->headindex == aworm->cur_lastindex-1) {
-        placeItem(aboard, aworm->wormpos[0].y, aworm->wormpos[0].x, BC_FREE_CELL, SYMBOL_FREE_CELL, COLP_FREE_CELL);
+        if(aworm->wormpos[0].y != UNUSED_POS_ELEM) {
+            placeItem(aboard, aworm->wormpos[0].y, aworm->wormpos[0].x, BC_FREE_CELL, SYMBOL_FREE_CELL, COLP_FREE_CELL);
+        }
     } else {
-        placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_FREE_CELL, SYMBOL_FREE_CELL, COLP_FREE_CELL);
+        if(aworm->wormpos[aworm->headindex+1].y != UNUSED_POS_ELEM) {
+            placeItem(aboard, aworm->wormpos[aworm->headindex+1].y, aworm->wormpos[aworm->headindex+1].x, BC_FREE_CELL, SYMBOL_FREE_CELL, COLP_FREE_CELL);
+        }
     }
 
 /*

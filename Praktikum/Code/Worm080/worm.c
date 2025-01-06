@@ -21,6 +21,7 @@
 #include "worm_model.h"
 #include "board_model.h"
 #include "messages.h"
+#include "options.h"
 
 // Management of the game
 void initializeColors();
@@ -85,7 +86,7 @@ void readUserInput(struct worm* aworm, enum GameStates* agame_state ) {
 
 int loop_counter = 0;
 
-enum ResCodes doLevel() {
+enum ResCodes doLevel(struct game_options* somegops) {
 
     // Das ist die Hauptfunktion und hier wird auch die main-loop gehandelt und viele andere Funktionen aufgerufen
     struct worm userworm; // Currently we just use one user worm in the game
@@ -149,7 +150,7 @@ enum ResCodes doLevel() {
         userworm.maxindex += 1;
         // END process userworm
         // Sleep a bit before we show the updated window
-        //napms(NAP_TIME);
+        napms(somegops->nap_time);
 
         // Display all the updates
         refresh();
@@ -199,6 +200,9 @@ enum ResCodes doLevel() {
             // Set error result code. This should never happen.
             res_code = RES_INTERNAL_ERROR;
     }
+
+    cleanupBoard(&theboard);
+
     // For some reason we left the control loop of the current level.
     // However, in this version we do not yet check for the reason.
     // There is no user feedback at the moment!
@@ -207,12 +211,28 @@ enum ResCodes doLevel() {
     return res_code;
 }
 
+enum ResCodes playGame(int argc, char* argv[]) {
+    enum ResCodes res_code; // Result code from functions
+    struct game_options thegops; // For options passed on the command line
+    
+    // Read the command line options
+    res_code = readCommandLineOptions(&thegops, argc, argv);
+    if ( res_code != RES_OK) {
+        return res_code; // Error: leave early
+    }
+    if (thegops.start_single_step) {
+        nodelay(stdscr, FALSE); // make getch to be a blocking call
+    }
+    // Play the game
+    res_code = doLevel(&thegops);
+    return res_code;
+}
 
 // ********************************************************************************************
 // MAIN
 // ********************************************************************************************
 
-int main(void) {
+int main(int argc, char ** argv) {
     
     enum ResCodes res_code;         // Result code from functions
 
@@ -234,7 +254,7 @@ int main(void) {
                 MIN_NUMBER_OF_COLS, MIN_NUMBER_OF_ROWS + ROWS_RESERVED);
         res_code = RES_FAILED;
     } else {
-        res_code = doLevel();
+        res_code = playGame(argc, argv);
         cleanupCursesApp();
     }
     return res_code;

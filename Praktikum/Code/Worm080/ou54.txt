@@ -1,0 +1,51 @@
+==11707== Memcheck, a memory error detector
+==11707== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==11707== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==11707== Command: ./bin/worm
+==11707== Parent PID: 10048
+==11707== 
+==11707== Invalid read of size 4
+==11707==    at 0x10A2D4: placeItem (board_model.c:28)
+==11707==    by 0x10A1FD: cleanWormTail (worm_model.c:243)
+==11707==    by 0x1096E9: doLevel (worm.c:134)
+==11707==    by 0x109915: main (worm.c:237)
+==11707==  Address 0x4b1fe44 is 4 bytes before a block of size 220 alloc'd
+==11707==    at 0x4845314: calloc (vg_replace_malloc.c:1328)
+==11707==    by 0x10A4FB: initializeBoard (board_model.c:91)
+==11707==    by 0x1095DC: doLevel (worm.c:100)
+==11707==    by 0x109915: main (worm.c:237)
+==11707== 
+==11707== Invalid write of size 4
+==11707==    at 0x10A2E1: placeItem (board_model.c:28)
+==11707==    by 0x10A1FD: cleanWormTail (worm_model.c:243)
+==11707==    by 0x1096E9: doLevel (worm.c:134)
+==11707==    by 0x109915: main (worm.c:237)
+==11707==  Address 0xfffffffc is not stack'd, malloc'd or (recently) free'd
+==11707== 
+==11707== 
+==11707== Process terminating with default action of signal 11 (SIGSEGV)
+==11707==  Access not within mapped region at address 0xFFFFFFFC
+==11707==    at 0x10A2E1: placeItem (board_model.c:28)
+==11707==    by 0x10A1FD: cleanWormTail (worm_model.c:243)
+==11707==    by 0x1096E9: doLevel (worm.c:134)
+==11707==    by 0x109915: main (worm.c:237)
+==11707==  If you believe this happened as a result of a stack
+==11707==  overflow in your program's main thread (unlikely but
+==11707==  possible), you can try to increase the size of the
+==11707==  main thread stack using the --main-stacksize= flag.
+==11707==  The main thread stack size used in this run was 8388608.
+==11707== 
+==11707== HEAP SUMMARY:
+==11707==     in use at exit: 230,851 bytes in 546 blocks
+==11707==   total heap usage: 558 allocs, 12 frees, 237,783 bytes allocated
+==11707== 
+==11707== LEAK SUMMARY:
+==11707==    definitely lost: 0 bytes in 0 blocks
+==11707==    indirectly lost: 0 bytes in 0 blocks
+==11707==      possibly lost: 448 bytes in 9 blocks
+==11707==    still reachable: 230,403 bytes in 537 blocks
+==11707==         suppressed: 0 bytes in 0 blocks
+==11707== Rerun with --leak-check=full to see details of leaked memory
+==11707== 
+==11707== For lists of detected and suppressed errors, rerun with: -s
+==11707== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)

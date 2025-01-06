@@ -1,0 +1,51 @@
+==7030== Memcheck, a memory error detector
+==7030== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==7030== Using Valgrind-3.19.0 and LibVEX; rerun with -h for copyright info
+==7030== Command: ./bin/worm
+==7030== Parent PID: 6971
+==7030== 
+==7030== Invalid read of size 4
+==7030==    at 0x10A2B7: placeItem (board_model.c:27)
+==7030==    by 0x109DDA: showWorm (worm_model.c:108)
+==7030==    by 0x109722: doLevel (worm.c:144)
+==7030==    by 0x109905: main (worm.c:237)
+==7030==  Address 0x4b20964 is 4 bytes before a block of size 192 alloc'd
+==7030==    at 0x4845314: calloc (vg_replace_malloc.c:1328)
+==7030==    by 0x10A46E: initializeBoard (board_model.c:80)
+==7030==    by 0x1095CC: doLevel (worm.c:100)
+==7030==    by 0x109905: main (worm.c:237)
+==7030== 
+==7030== Invalid write of size 4
+==7030==    at 0x10A2C4: placeItem (board_model.c:27)
+==7030==    by 0x109DDA: showWorm (worm_model.c:108)
+==7030==    by 0x109722: doLevel (worm.c:144)
+==7030==    by 0x109905: main (worm.c:237)
+==7030==  Address 0xfffffffc is not stack'd, malloc'd or (recently) free'd
+==7030== 
+==7030== 
+==7030== Process terminating with default action of signal 11 (SIGSEGV)
+==7030==  Access not within mapped region at address 0xFFFFFFFC
+==7030==    at 0x10A2C4: placeItem (board_model.c:27)
+==7030==    by 0x109DDA: showWorm (worm_model.c:108)
+==7030==    by 0x109722: doLevel (worm.c:144)
+==7030==    by 0x109905: main (worm.c:237)
+==7030==  If you believe this happened as a result of a stack
+==7030==  overflow in your program's main thread (unlikely but
+==7030==  possible), you can try to increase the size of the
+==7030==  main thread stack using the --main-stacksize= flag.
+==7030==  The main thread stack size used in this run was 8388608.
+==7030== 
+==7030== HEAP SUMMARY:
+==7030==     in use at exit: 222,047 bytes in 513 blocks
+==7030==   total heap usage: 525 allocs, 12 frees, 228,979 bytes allocated
+==7030== 
+==7030== LEAK SUMMARY:
+==7030==    definitely lost: 0 bytes in 0 blocks
+==7030==    indirectly lost: 0 bytes in 0 blocks
+==7030==      possibly lost: 448 bytes in 9 blocks
+==7030==    still reachable: 221,599 bytes in 504 blocks
+==7030==         suppressed: 0 bytes in 0 blocks
+==7030== Rerun with --leak-check=full to see details of leaked memory
+==7030== 
+==7030== For lists of detected and suppressed errors, rerun with: -s
+==7030== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
